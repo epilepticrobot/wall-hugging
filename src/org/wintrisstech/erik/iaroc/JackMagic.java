@@ -4,6 +4,8 @@ import android.os.SystemClock;
 import ioio.lib.api.IOIO;
 import ioio.lib.api.exception.ConnectionLostException;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.wintrisstech.irobot.ioio.IRobotCreateAdapter;
 import org.wintrisstech.irobot.ioio.IRobotCreateInterface;
 import org.wintrisstech.irobot.ioio.IRobotCreateScript;
@@ -14,7 +16,7 @@ import org.wintrisstech.sensors.UltraSonicSensors;
  *
  * @author Erik
  */
-public class JackMagic extends Ferrari 
+public class JackMagic extends Ferrari
 {
     private static final String TAG = "Ferrari";
     private static final int RED_BUOY_CODE = 248;
@@ -46,7 +48,6 @@ public class JackMagic extends Ferrari
     private int column;
     private boolean running = true;
     private final static int SECOND = 1000; // number of millis in a second
-    
     private int presentState = 0;
     private int statePointer = 0;
     private int[] c =
@@ -99,7 +100,9 @@ public class JackMagic extends Ferrari
     {
         try
         {
-            stateController();
+            //stateController();\
+            wallHugger();
+
         } catch (Exception ex)
         {
             dashboard.log("problem: " + ex.getMessage());
@@ -110,12 +113,11 @@ public class JackMagic extends Ferrari
         setRunning(false);
     }
 
-
     private void backingUp(String direction) throws Exception
     {
-        
+
         dashboard.log("backingup");
-        driveDirect(-200,-200);
+        driveDirect(-200, -200);
         SystemClock.sleep(1000);
         if (direction.equals("right"))
         {
@@ -213,6 +215,28 @@ public class JackMagic extends Ferrari
         {
             // dashboard.log("no bump detected");
             statePointer = 0;
+        }
+    }
+
+    private void wallHugger()
+    {
+ 
+        dashboard.speak("hugging wall");
+        while (true)
+        {
+            try
+            {
+                readSensors(SENSORS_BUMPS_AND_WHEEL_DROPS);
+                       driveDirect(500, 500);
+                if (isBumpRight())
+                {
+                    driveDirect(-500, 500);
+                    SystemClock.sleep(300);
+                    driveDirect(500, 500);
+                }
+            } catch (ConnectionLostException ex)
+            {
+            }
         }
     }
 }
