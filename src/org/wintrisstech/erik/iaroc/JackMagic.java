@@ -3,11 +3,9 @@ package org.wintrisstech.erik.iaroc;
 import android.os.SystemClock;
 import ioio.lib.api.IOIO;
 import ioio.lib.api.exception.ConnectionLostException;
-import java.util.Random;
-import org.wintrisstech.irobot.ioio.IRobotCreateAdapter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.wintrisstech.irobot.ioio.IRobotCreateInterface;
-import org.wintrisstech.irobot.ioio.IRobotCreateScript;
-import org.wintrisstech.sensors.UltraSonicSensors;
 
 /**
  * A Ferrari is an implementation of the IRobotCreateInterface.
@@ -97,8 +95,10 @@ public class JackMagic extends Ferrari
      */
     public void run()
     {
+        dashboard.speak("i am jack version 2");
         try
         {
+            readBeacon();
             stateController();
         } catch (Exception ex)
         {
@@ -167,7 +167,7 @@ public class JackMagic extends Ferrari
             {
                 case 0:
                     presentState = 0;
-                    dashboard.log("0");
+//                    dashboard.log("0");
                     break;
                 case 1:
                     presentState = 1;
@@ -213,6 +213,28 @@ public class JackMagic extends Ferrari
         {
             // dashboard.log("no bump detected");
             statePointer = 0;
+        }
+    }
+    public void readBeacon()
+    {
+        try
+        {
+            dashboard.speak("Ha Ha Ha Ha Ha");
+            readSensors(SENSORS_INFRARED_BYTE);
+            if (getInfraredByte() != 255)
+            {
+                dashboard.speak("Sensing Sensing Sensing");
+            }
+    //    private static final int RED_BUOY_CODE = 248;
+    //    private static final int GREEN_BUOY_CODE = 244;
+    //    private static final int FORCE_FIELD_CODE = 242;
+    //    private static final int BOTH_BUOY_CODE = 252;
+    //    private static final int BOTH_BUOY_FORCE_FIELD_CODE = 254;
+    //    private static final int GREEN_BUOY_FORCE_FIELD_CODE = 246;
+    //    private static final int BOTH_BUOY_FORCE_FIELD_CODE = 254;
+        } catch (ConnectionLostException ex)
+        {
+            dashboard.log("Reading infrared sensors!");
         }
     }
 }
