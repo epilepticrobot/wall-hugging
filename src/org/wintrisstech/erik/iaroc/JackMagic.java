@@ -98,10 +98,8 @@ public class JackMagic extends Ferrari
         try
         {
             //stateController();
-            wallHugger();
+            //wallHugger();
             //readBeacon();
-            
-
         } catch (Exception ex)
         {
             dashboard.log("problem: " + ex.getMessage());
@@ -217,6 +215,28 @@ public class JackMagic extends Ferrari
         }
     }
     
+    private void wallHugger()
+    {
+ 
+        dashboard.speak("hugging wall");
+        while (true)
+        {
+            try
+            {
+                readSensors(SENSORS_BUMPS_AND_WHEEL_DROPS);
+                       driveDirect(500, 500);
+                if (isBumpRight())
+                {
+                    driveDirect(-500, 500);
+                    SystemClock.sleep(300);
+                    driveDirect(500, 500);
+                }
+            } catch (ConnectionLostException ex)
+            {
+            }
+        }
+    }
+
     public void readBeacon()
     {
         try
@@ -237,28 +257,6 @@ public class JackMagic extends Ferrari
         } catch (ConnectionLostException ex)
         {
             dashboard.log("Reading infrared sensors!");
-        }
-    }
-    
-    private void wallHugger()
-    {
- 
-        dashboard.speak("hugging wall");
-        while (true)
-        {
-            try
-            {
-                readSensors(SENSORS_BUMPS_AND_WHEEL_DROPS);
-                       driveDirect(500, 500);
-                if (isBumpRight())
-                {
-                    driveDirect(-500, 500);
-                    SystemClock.sleep(300);
-                    driveDirect(500, 500);
-                }
-            } catch (ConnectionLostException ex)
-            {
-            }
         }
     }
 }
