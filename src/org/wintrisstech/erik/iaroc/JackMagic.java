@@ -1,6 +1,9 @@
+//once the beacon is detected, the robot stops.
+
 package org.wintrisstech.erik.iaroc;
 
 import android.os.SystemClock;
+import dalvik.bytecode.Opcodes;
 import ioio.lib.api.IOIO;
 import ioio.lib.api.exception.ConnectionLostException;
 import java.util.logging.Level;
@@ -12,8 +15,8 @@ import org.wintrisstech.irobot.ioio.IRobotCreateInterface;
  *
  * @author Erik
  */
-public class JackMagic extends Ferrari {
-
+public class JackMagic extends Ferrari
+{
     private static final String TAG = "Ferrari";
     private static final int RED_BUOY_CODE = 248;
     private static final int GREEN_BUOY_CODE = 244;
@@ -44,13 +47,16 @@ public class JackMagic extends Ferrari {
     private int column;
     private boolean running = true;
     private final static int SECOND = 1000; // number of millis in a second
-    private int[] c = {
+    private int[] c =
+    {
         60, 200
     };
-    private int[] e = {
+    private int[] e =
+    {
         64, 200
     };
-    private int[] g = {
+    private int[] g =
+    {
         67, 200
     };
 
@@ -63,7 +69,8 @@ public class JackMagic extends Ferrari {
      * @param dashboard the Dashboard instance that is connected to the Ferrari
      * @throws ConnectionLostException
      */
-    public JackMagic(IOIO ioio, IRobotCreateInterface create, Dashboard dashboard) throws ConnectionLostException {
+    public JackMagic(IOIO ioio, IRobotCreateInterface create, Dashboard dashboard) throws ConnectionLostException
+    {
         super(ioio, create, dashboard);
     }
 
@@ -71,18 +78,19 @@ public class JackMagic extends Ferrari {
      * Main method that gets the Ferrari running.
      *
      */
-    public void run() {
-        dashboard.speak("i am jack version 3");
-        try {
+    public void run()
+    {
+        dashboard.speak("i am jack version 5");
+        try
+        {
             //StateControllerInterface jackStateController = new StateControllerVic(delegate, dashboard);
             //jackStateController.startStateController();
-
             StateControllerInterface jackStateController = new StateControllerJackBasic(delegate, dashboard);
             jackStateController.startStateController();
-
             //wallHugger();
             //readBeacon();
-        } catch (Exception ex) {
+        } catch (Exception ex)
+        {
             dashboard.log("problem: " + ex.getMessage());
         }
         dashboard.log("Run completed.");
@@ -91,39 +99,51 @@ public class JackMagic extends Ferrari {
         setRunning(false);
     }
 
-    private void wallHugger() {
+    private void wallHugger()
+    {
 
         dashboard.speak("hugging wall");
-        while (true) {
-            try {
+        while (true)
+        {
+            try
+            {
                 readSensors(SENSORS_BUMPS_AND_WHEEL_DROPS);
                 driveDirect(500, 500);
-                if (isBumpRight()) {
+                if (isBumpRight())
+                {
                     driveDirect(-500, 500);
                     SystemClock.sleep(300);
                     driveDirect(500, 500);
                 }
-            } catch (ConnectionLostException ex) {
+            } catch (ConnectionLostException ex)
+            {
             }
         }
     }
 
-    public void readBeacon() {
-        try {
-            dashboard.speak("Ha Ha Ha Ha Ha");
-            readSensors(SENSORS_INFRARED_BYTE);
-            if (getInfraredByte() != 255) {
-                dashboard.speak("Sensing Sensing Sensing");
-            }
-            //    private static final int RED_BUOY_CODE = 248;
-            //    private static final int GREEN_BUOY_CODE = 244;
-            //    private static final int FORCE_FIELD_CODE = 242;
-            //    private static final int BOTH_BUOY_CODE = 252;
-            //    private static final int BOTH_BUOY_FORCE_FIELD_CODE = 254;
-            //    private static final int GREEN_BUOY_FORCE_FIELD_CODE = 246;
-            //    private static final int BOTH_BUOY_FORCE_FIELD_CODE = 254;
-        } catch (ConnectionLostException ex) {
-            dashboard.log("Reading infrared sensors!");
-        }
-    }
+//    public void readBeacon()
+//    {
+//        try
+//        {
+//            dashboard.log("hahahahhah");
+//            dashboard.speak("Ha Ha Ha Ha Ha");
+//            readSensors(SENSORS_INFRARED_BYTE);
+//            if (getInfraredByte() != 255)
+//            {
+//                dashboard.log("Sensing Sensing Sensing");
+//                dashboard.speak("Sensing Sensing Sensing");
+//                this.demo(1);
+//            }
+//            //    private static final int RED_BUOY_CODE = 248;
+//            //    private static final int GREEN_BUOY_CODE = 244;
+//            //    private static final int FORCE_FIELD_CODE = 242;
+//            //    private static final int BOTH_BUOY_CODE = 252;
+//            //    private static final int BOTH_BUOY_FORCE_FIELD_CODE = 254;
+//            //    private static final int GREEN_BUOY_FORCE_FIELD_CODE = 246;
+//            //    private static final int BOTH_BUOY_FORCE_FIELD_CODE = 254;
+//        } catch (ConnectionLostException ex)
+//        {
+//            dashboard.log("Reading infrared sensors!");
+//        }
+//    }
 }
