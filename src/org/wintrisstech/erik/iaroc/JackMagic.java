@@ -1,9 +1,11 @@
-//once the beacon is detected, the robot stops.
-
 package org.wintrisstech.erik.iaroc;
 
+import android.os.SystemClock;
 import ioio.lib.api.IOIO;
 import ioio.lib.api.exception.ConnectionLostException;
+import java.util.Calendar;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.wintrisstech.irobot.ioio.IRobotCreateInterface;
 
 /**
@@ -74,16 +76,18 @@ public class JackMagic extends Ferrari
      * Main method that gets the Ferrari running.
      *
      */
-    public void run() {
-        dashboard.speak("i am jack version 5");
+    public void run()
+    {
+        dashboard.speak("i am jack version 3");
+        dashboard.log("jack");
         try
         {
-            
-            wallHugger();
-            //StateControllerInterface jackStateController = new StateControllerVic(delegate, dashboard);
+//            wallHugger();
+            timedWallHugging();
+            turnRight();
+            //joonsWallHugger();
+            //StateControllerInterface jackStateController = new StateControllerJackBasic(delegate, dashboard);
             //jackStateController.startStateController();
-            StateControllerInterface jackStateController = new StateControllerJackBasic(delegate, dashboard);
-            jackStateController.startStateController();
             //readBeacon();
         } catch (Exception ex)
         {
@@ -105,17 +109,11 @@ public class JackMagic extends Ferrari
             {
                 readSensors(SENSORS_BUMPS_AND_WHEEL_DROPS);
                 driveDirect(500, 500);
+                //keep turning until it finds another bump
+
                 if (isBumpRight())
                 {
-                    readSensors(SENSORS_ANGLE);
-                    int currentDegree = getAngle();
-                    while(currentDegree > -5)
-                   {
-                       driveDirect(-500,500);
-                       readSensors(SENSORS_ANGLE);
-                       currentDegree = +getAngle();
-                       dashboard.log("" + currentDegree);
-                   }
+                    turnLeft();
 
                 }
             } catch (ConnectionLostException ex)
@@ -124,31 +122,110 @@ public class JackMagic extends Ferrari
         }
     }
 
+    private void turnLeft() throws ConnectionLostException
+    {
+
+        readSensors(SENSORS_ANGLE);
+        int currentDegree = getAngle();
+        dashboard.log("" + currentDegree);
+        while (currentDegree > -90)
+        {
+            // dashboard.log("in while loop");
+            driveDirect(500, -500);
+            readSensors(SENSORS_ANGLE);
+            currentDegree = currentDegree + getAngle();
+
+        }
+    }
+
+    private void joonsWallHugger() throws ConnectionLostException
+    {
+        dashboard.log("joon");
+        while (true)
+        {
+            //if it has been away from the wall for more than a second, curve to the left, until it hits the wall again
+            int lastNewSecond = Calendar.getInstance().get(Calendar.SECOND);
+            while (true)
+            {
+                readSensors(SENSORS_BUMPS_AND_WHEEL_DROPS);
+                dashboard.log("in joonswallhugger");
+                if (Calendar.getInstance().get(Calendar.SECOND) == lastNewSecond + 2)
+                {
+                    lastNewSecond = Calendar.getInstance().get(Calendar.SECOND);
+                    dashboard.speak("" + lastNewSecond);
+                    dashboard.log("//" + lastNewSecond);
+                    if (!isBumpLeft())
+                    {
+
+                        dashboard.log("turning");
+                        turn(5);
+                    }
+
+                }
+            }
+
+        }
+    }
+
+    private void timedWallHugging() throws ConnectionLostException
+    {
+
+        while (true)
+        {
+            driveDirect(100, 100);
+            readSensors(SENSORS_BUMPS_AND_WHEEL_DROPS);
+            if (isBumpRight())
+            {
+                turnLeft();
+                dashboard.log("turning right");
+                dashboard.speak("right");
+                driveDirect(100, 100);
+                SystemClock.sleep(2000);
+                
+                turnRight();
+                dashboard.log("turning left");
+                dashboard.speak("left");
+            }
+
+
+        }
+
+    }
+
+    public void turn(int degreesToTurn) throws ConnectionLostException
+    {
+        //driveDirect(200, -200);
+        int totalAngleTurned = 0;
+        while (totalAngleTurned < degreesToTurn)
+        {
+            readSensors(SENSORS_ANGLE);
+            totalAngleTurned += getAngle();
+        }
+
+    }
 
     private void turnSpecifiedDegree() throws ConnectionLostException
     {
-        
+
         int currentDegree = getAngle();
         readSensors(SENSORS_ANGLE);
         dashboard.log("turning specified degree");
-        while(true)
-               {
+        while (true)
+        {
+            readSensors(SENSORS_ANGLE);
+            //while not at 10 degrees
+            while (currentDegree > -10)
+            {
+                driveDirect(-500, 500);
                 readSensors(SENSORS_ANGLE);
-             //while not at 10 degrees
-                   while(currentDegree > -10)
-                   {
-                       driveDirect(-500,500);
-                       readSensors(SENSORS_ANGLE);
-                       currentDegree = +getAngle();
-                       dashboard.log("" + currentDegree);
-                   }
-                   driveDirect(0,0);
-                   dashboard.log("stop");
-             //keep turning
-                }
+                currentDegree = +getAngle();
+                dashboard.log("" + currentDegree);
+            }
+            driveDirect(0, 0);
+            dashboard.log("stop");
+            //keep turning
+        }
     }
-
-    
 //    public void readBeacon()
 //    {
 //        try
@@ -175,4 +252,19 @@ public class JackMagic extends Ferrari
 //        }
 //    }
 
+    private void turnRight() throws ConnectionLostException
+    {
+
+        readSensors(SENSORS_ANGLE);
+        int currentDegree = getAngle();
+        dashboard.log("" + currentDegree);
+        while (currentDegree <90)
+        {
+            //dashboard.log("in while loop");
+            driveDirect(-500, 500);
+            readSensors(SENSORS_ANGLE);
+            currentDegree = currentDegree + getAngle();
+
+        }
+    }
 }
